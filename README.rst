@@ -2,14 +2,8 @@
 AppDynamics REST API Library
 ============================
 
-Current version: 0.4.5
-Released: 23-Jun-2015
-
-.. image:: https://img.shields.io/travis/tradel/AppDynamicsREST.svg
-   :target: https://travis-ci.org/tradel/AppDynamicsREST/
-
-.. image:: https://img.shields.io/pypi/dm/AppDynamicsREST.svg
-   :target: https://pypi.python.org/pypi/AppDynamicsREST/
+Current version: 0.4.10
+Released: 10-Nov-2016
 
 
 Introduction
@@ -32,7 +26,7 @@ Install via ``pip``::
 
 Install from source::
 
-    $ git clone git://github.com/tradel/AppDynamicsREST.git
+    $ git clone git://github.com/appdynamics/AppDynamicsREST.git
     $ cd AppDynamicsREST
     $ python setup.py install
 
@@ -92,6 +86,6 @@ To ask a question or join the discussion, visit the AppDynamics `Community page`
 
 
 .. _AppDynamics: http://www.appdynamics.com/
-.. _Github: https://github.com/tradel/AppDynamicsREST
+.. _Github: https://github.com/appdynamics/AppDynamicsREST
 .. _Community page: http://community.appdynamics.com/t5/eXchange-Community-AppDynamics/Python-SDK-for-Controller-REST-API/idi-p/917
 .. _readthedocs.org: http://appdynamicsrest.readthedocs.org/en/latest/
