@@ -21,7 +21,7 @@ class EntityDefinition(JsonObject):
                     'NOTIFICATION_CONFIG', 'OBJECT_INSTANCE_TRACKING', 'POLICY', 'RULE', 'SQL_DATA_GATHERER_CONFIG',
                     'STACK_TRACE', 'THREAD_TASK', 'TRANSACTION_MATCH_POINT_CONFIG', 'USER', 'GROUP', 'ACCOUNT_ROLE',
                     'WORKFLOW', 'WORKFLOW_EXCUTION', 'POJO_DATA_GATHERER_CONFIG', 'HTTP_REQUEST_DATA_GATHERER_CONFIG',
-                    'BASE_PAGE', 'IFRAME', 'AJAX_REQUEST')
+                    'BASE_PAGE', 'IFRAME', 'AJAX_REQUEST', 'INFO_POINT')
 
     def __init__(self, entity_id=0, entity_type=''):
         self._type = None
