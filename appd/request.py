@@ -5,6 +5,7 @@ This module contains the main classes for handling requests to the AppDynamics R
 from __future__ import print_function
 
 import sys
+import json
 import requests
 
 from datetime import datetime
@@ -22,6 +23,7 @@ from appd.model.policy_violation import *
 from appd.model.snapshot import *
 from appd.model.metric_data import *
 from appd.model.node import *
+from appd.model.set_controller_url import *
 
 
 class AppDynamicsClient(object):
@@ -92,7 +94,7 @@ class AppDynamicsClient(object):
     @base_url.setter
     def base_url(self, new_url):
         self._base_url = new_url
-        if not '://' in self._base_url:
+        if '://' not in self._base_url:
             self._base_url = 'http://' + self._base_url
         while self._base_url.endswith('/'):
             self._base_url = self._base_url[:-1]
@@ -141,13 +143,13 @@ class AppDynamicsClient(object):
             self._session = Session()
         return self._session
 
-    def request(self, path, params=None, method='GET', json=True):
+    def request(self, path, params=None, method='GET', use_json=True):
         if not path.startswith('/'):
             path = '/' + path
         url = self._base_url + path
 
         params = params or {}
-        if json:
+        if use_json and method == 'GET':
             params['output'] = 'JSON'
         for k in list(params.keys()):
             if params[k] is None:
@@ -156,13 +158,17 @@ class AppDynamicsClient(object):
         if self.debug:
             print('Retrieving ' + url, self._auth, params)
 
-        r = self._get_session().request(method, url, auth=self._auth, params=params)
+        if method == 'GET':
+            r = self._get_session().request(method, url, auth=self._auth, params=params)
+        else:
+            headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
+            r = self._get_session().request(method, url, auth=self._auth, data=json.dumps(params), headers=headers)
 
         if r.status_code != requests.codes.ok:
             print(url, file=sys.stderr)
             r.raise_for_status()
 
-        return r.json() if json else r.text
+        return r.json() if use_json else r.text
 
     def _app_path(self, app_id, path=None):
         app_id = app_id if isinstance(app_id, int) or isinstance(app_id, str) else self._app_id
@@ -202,8 +208,13 @@ class AppDynamicsClient(object):
 
     # Top-level requests
 
-    def _top_request(self, cls, path):
-        return cls.from_json(self.request('/controller/rest' + path))
+    def _top_request(self, cls, path, params=None, method='GET'):
+        return cls.from_json(self.request('/controller/rest' + path, params, method))
+
+    def set_controller_url(self, controllerURL):
+        param = {'controllerURL': controllerURL}
+        return self._top_request(SetControllerUrlResponse,
+                                 '/accounts/%s/update-controller-url' % self.account, param, 'POST')
 
     def get_config(self):
         """
@@ -291,7 +302,7 @@ class AppDynamicsClient(object):
         :returns: parameters to be sent to controller
         :rtype: dict
         """
-        if time_range_type and not time_range_type in self.TIME_RANGE_TYPES:
+        if time_range_type and time_range_type not in self.TIME_RANGE_TYPES:
             raise ValueError('time_range_time must be one of: ' + ', '.join(self.TIME_RANGE_TYPES))
 
         elif time_range_type == 'BEFORE_NOW' and not duration_in_mins:
@@ -426,8 +437,8 @@ class AppDynamicsClient(object):
 
         return self._app_request(PolicyViolations, '/problems/healthrule-violations', app_id, params)
 
-    def _v2_request(self, cls, path, params=None):
-        return cls.from_json(self.request('/api' + path, params))
+    def _v2_request(self, cls, path, params=None, method='GET'):
+        return cls.from_json(self.request('/api' + path, params, method))
 
     def get_my_account(self):
         """
@@ -483,4 +494,3 @@ class AppDynamicsClient(object):
             'enddate': end_time.isoformat() if end_time else None
         }
         return self._v2_request(LicenseUsages, '/accounts/{0}/licensemodules/usages'.format(account_id), params)
-

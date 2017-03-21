@@ -6,8 +6,6 @@ Model classes for AppDynamics REST API
 
 
 from six.moves import UserList
-from appd.time import from_ts
-from datetime import datetime
 
 
 def _filter_func(obj, pred):
@@ -65,4 +63,3 @@ class JsonList(UserList):
     def __str__(self):
         rep = ', '.join([str(x) for x in self.data])
         return '<{0}[{1}]: {2}>'.format(self.__class__.__name__, len(self.data), rep)
-
