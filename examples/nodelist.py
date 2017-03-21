@@ -13,7 +13,6 @@ from appd.request import AppDynamicsClient
 
 __author__ = 'Todd Radel'
 __copyright__ = 'Copyright (c) 2013-2015 AppDynamics Inc.'
-__version__ = '0.4.5'
 
 
 args = parse_argv()
@@ -22,4 +21,3 @@ c = AppDynamicsClient(args.url, args.username, args.password, args.account, args
 for app in c.get_applications():
     for node in c.get_nodes(app.id):
         print(','.join([app.name, node.tier_name, node.name, node.machine_name]))
-

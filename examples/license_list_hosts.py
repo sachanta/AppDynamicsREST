@@ -12,7 +12,6 @@ from appd.request import AppDynamicsClient
 
 __author__ = 'Todd Radel'
 __copyright__ = 'Copyright (c) 2013-2015 AppDynamics Inc.'
-__version__ = '0.4.5'
 
 
 def incr(d, name, amt=1):
@@ -68,6 +67,3 @@ with open('data/licenses_by_host.csv', 'w') as f:
             license_count = len(nodes_on_machine)
 
         w.writerow([first_node.app_name, first_node.machine_name, agent_type, license_count])
-        
-        
-

@@ -18,7 +18,6 @@ import MySQLdb
 
 __author__ = 'Todd Radel'
 __copyright__ = 'Copyright (c) 2013-2015 AppDynamics Inc.'
-__version__ = '0.4.5'
 
 
 def parse_argv():
@@ -379,4 +378,3 @@ if __name__ == '__main__':
             f.write(html)
     else:
         send_html_email(args, html)
-

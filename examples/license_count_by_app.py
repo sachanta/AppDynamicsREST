@@ -12,7 +12,6 @@ from appd.request import AppDynamicsClient
 
 __author__ = 'Todd Radel'
 __copyright__ = 'Copyright (c) 2013-2015 AppDynamics Inc.'
-__version__ = '0.4.5'
 
 
 def incr(d, name, amt=1):
@@ -67,7 +66,6 @@ for machine_id, nodes_on_machine_iter in itertools.groupby(nodes, key=group_func
     incr(lic_counts, app_name, license_count)
     incr(host_counts, app_name, 1)
     incr(node_counts, app_name, len(nodes_on_machine))
-
 
 
 # Print the results.

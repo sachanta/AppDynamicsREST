@@ -15,7 +15,6 @@ from appd.request import AppDynamicsClient
 
 __author__ = 'Todd Radel'
 __copyright__ = 'Copyright (c) 2013-2015 AppDynamics Inc.'
-__version__ = '0.4.5'
 
 
 args = parse_argv()
@@ -34,4 +33,3 @@ deps = c.get_metric_tree(app_id, metric_path)
 for dep in deps:
     if dep.type == 'folder':
         print(dep.name)
-

@@ -16,7 +16,6 @@ from appd.time import from_ts, to_ts
 
 __author__ = 'Todd Radel'
 __copyright__ = 'Copyright (c) 2013-2015 AppDynamics Inc.'
-__version__ = '0.4.5'
 
 
 # Parse the command line arguments and initialize the client
@@ -53,4 +52,3 @@ for v in violations:
             print("Affected Node: ", nodes_by_id[v.affected_entity.entity_id].name)
         except KeyError:
             print("Affected Node: UNKNOWN")
-

@@ -13,7 +13,6 @@ from appd.request import AppDynamicsClient
 
 __author__ = 'Kyle Furlong'
 __copyright__ = 'Copyright (c) 2013-2017 AppDynamics Inc.'
-__version__ = '0.4.15'
 
 
 args = parse_argv()
