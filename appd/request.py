@@ -24,6 +24,7 @@ from appd.model.snapshot import *
 from appd.model.metric_data import *
 from appd.model.node import *
 from appd.model.set_controller_url import *
+from appd.model.event import *
 
 
 class AppDynamicsClient(object):
@@ -351,6 +352,37 @@ class AppDynamicsClient(object):
                        'rollup': rollup})
 
         return self._app_request(MetricData, '/metric-data', app_id, params)
+
+    def get_events(self, app_id=None, event_types='ALL', severities='ERROR', time_range_type='BEFORE_NOW',
+                   duration_in_mins=15, start_time=None, end_time=None):
+        """
+        Retrieves events.
+
+        :param int app_id: Application ID to retrieve nodes for. If :const:`None`, the value stored in the
+            `app_id` property will be used.
+        :param str event_types: CSV of the events types to search on
+        :param str severities: CSV of the severities to search on
+        :param str time_range_type: Must be one of :const:`BEFORE_NOW`, :const:`BEFORE_TIME`,
+            :const:`AFTER_TIME`, or :const:`BETWEEN_TIMES`.
+            See :ref:`time-range-types` for a full explanation.
+        :param int duration_in_mins: Number of minutes before now. Only valid if the
+            :attr:`time_range_type` is :const:`BEFORE_NOW`.
+        :param long start_time: Start time, expressed in milliseconds since epoch. Only valid if the
+            :attr:`time_range_type` is :const:`AFTER_TIME` or :const:`BETWEEN_TIMES`.
+        :param long end_time: End time, expressed in milliseconds since epoch. Only valid if the
+            :attr:`time_range_type` is :const:`BEFORE_TIME` or :const:`BETWEEN_TIMES`.
+        :param bool rollup: If :const:`False`, return individual data points for each time slice in
+            the given time range. If :const:`True`, aggregates the data and returns a single data point.
+        :returns: A list of events for the specified app, filtered by the event type and severities desired.
+        :rtype: appd.model.Events
+        """
+
+        params = self._validate_time_range(time_range_type, duration_in_mins, start_time, end_time)
+        params.update({'event-types': event_types,
+                       'severities': severities,
+                       'output': 'JSON'})
+
+        return self._app_request(Events, '/events', app_id, params)
 
     def get_snapshots(self, app_id=None, time_range_type=None, duration_in_mins=None,
                       start_time=None, end_time=None, **kwargs):
