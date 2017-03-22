@@ -385,7 +385,7 @@ class AppDynamicsClient(object):
         return self._app_request(Events, '/events', app_id, params)
 
     def create_event(self, app_id=None, summary='', comment='', eventtype='APPLICATION_CONFIG_CHANGE',
-                     severity='INFO'):
+                     severity='INFO', customeventtype=None, node=None, tier=None, bt=None):
         """
         Creates an event.
 
@@ -398,10 +398,18 @@ class AppDynamicsClient(object):
         :returns: Message containing the event ID if successful
         """
 
+        # TODO: support array of properties
+
         params = {'summary': summary,
                   'comment': comment,
                   'eventtype': eventtype,
                   'severity': severity}
+
+        if (eventtype == "CUSTOM"):
+            params.update({'customeventtype': customeventtype,
+                           'node': node,
+                           'tier': tier,
+                           'bt': bt})
 
         path = self._app_path(app_id, '/events')
         return self.request(path, params, method='POST', query=True, use_json=False)

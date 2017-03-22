@@ -23,3 +23,14 @@ resp = c.create_event(app_id=16,
                       severity='INFO',
                       eventtype='APPLICATION_CONFIG_CHANGE')
 print(resp)
+
+resp = c.create_event(app_id=16,
+                      summary='Custom Event 1',
+                      comment='This is an event created by the Python SDK',
+                      severity='INFO',
+                      eventtype='CUSTOM',
+                      customeventtype='MYCUSTOMEVENT',
+                      node="python-node-1",
+                      tier="python",
+                      bt="/admin")
+print(resp)
