@@ -144,7 +144,7 @@ class AppDynamicsClient(object):
             self._session = Session()
         return self._session
 
-    def request(self, path, params=None, method='GET', use_json=True):
+    def request(self, path, params=None, method='GET', use_json=True, query=True):
         if not path.startswith('/'):
             path = '/' + path
         url = self._base_url + path
@@ -159,7 +159,7 @@ class AppDynamicsClient(object):
         if self.debug:
             print('Retrieving ' + url, self._auth, params)
 
-        if method == 'GET':
+        if method == 'GET' or query:
             r = self._get_session().request(method, url, auth=self._auth, params=params)
         else:
             headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
@@ -209,13 +209,13 @@ class AppDynamicsClient(object):
 
     # Top-level requests
 
-    def _top_request(self, cls, path, params=None, method='GET'):
-        return cls.from_json(self.request('/controller/rest' + path, params, method))
+    def _top_request(self, cls, path, params=None, method='GET', query=True):
+        return cls.from_json(self.request('/controller/rest' + path, params, method, query=query))
 
     def set_controller_url(self, controllerURL):
         param = {'controllerURL': controllerURL}
         return self._top_request(SetControllerUrlResponse,
-                                 '/accounts/%s/update-controller-url' % self.account, param, 'POST')
+                                 '/accounts/%s/update-controller-url' % self.account, param, 'POST', query=False)
 
     def get_config(self):
         """
@@ -237,9 +237,9 @@ class AppDynamicsClient(object):
 
     # Application-level requests
 
-    def _app_request(self, cls, path, app_id=None, params=None):
+    def _app_request(self, cls, path, app_id=None, params=None, method='GET', query=True, use_json=True):
         path = self._app_path(app_id, path)
-        return cls.from_json(self.request(path, params))
+        return cls.from_json(self.request(path, params, method=method, query=query, use_json=use_json))
 
     def get_bt_list(self, app_id=None, excluded=False):
         """
@@ -383,6 +383,28 @@ class AppDynamicsClient(object):
                        'output': 'JSON'})
 
         return self._app_request(Events, '/events', app_id, params)
+
+    def create_event(self, app_id=None, summary='', comment='', eventtype='APPLICATION_CONFIG_CHANGE',
+                     severity='INFO'):
+        """
+        Creates an event.
+
+        :param int app_id: Application ID to retrieve nodes for. If :const:`None`, the value stored in the
+            `app_id` property will be used.
+        :param str summary: Summary of the event
+        :param str comment: Comment about the event
+        :param str eventtype: Event type
+        :param str severity: Severity of event, one of INFO, WARN, ERROR
+        :returns: Message containing the event ID if successful
+        """
+
+        params = {'summary': summary,
+                  'comment': comment,
+                  'eventtype': eventtype,
+                  'severity': severity}
+
+        path = self._app_path(app_id, '/events')
+        return self.request(path, params, method='POST', query=True, use_json=False)
 
     def get_snapshots(self, app_id=None, time_range_type=None, duration_in_mins=None,
                       start_time=None, end_time=None, **kwargs):
