@@ -25,6 +25,7 @@ from appd.model.metric_data import *
 from appd.model.node import *
 from appd.model.set_controller_url import *
 from appd.model.event import *
+from appd.model.action_suppressions import *
 
 
 class AppDynamicsClient(object):
@@ -519,6 +520,10 @@ class AppDynamicsClient(object):
         :rtype: LicenseModules
         """
         return self._v2_request(LicenseModules, '/accounts/{0}/licensemodules'.format(account_id))
+
+    def get_action_suppressions(self, account_id, app_id):
+        return self._v2_request(ActionSuppressionsResponse,
+                                '/accounts/{0}/applications/{1}/actionsuppressions'.format(account_id, app_id))
 
     def get_license_usage(self, account_id, license_module=None, start_time=None, end_time=None):
         """
