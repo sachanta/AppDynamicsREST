@@ -21,5 +21,8 @@ account = c.get_my_account()
 resp = c.get_action_suppressions(account.id, app_id=16)
 print(resp)
 
-resp = c.get_action_suppression(account.id, app_id=16, action_suppression_id=1)
+resp = c.get_action_suppression(account.id, app_id=16, action_suppression_id=3)
+print(resp)
+
+resp = c.delete_action_suppression(account.id, app_id=16, action_suppression_id=3)
 print(resp)

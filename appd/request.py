@@ -531,6 +531,13 @@ class AppDynamicsClient(object):
                                                                                                app_id,
                                                                                                action_suppression_id))
 
+    def delete_action_suppression(self, account_id, app_id, action_suppression_id):
+        return self.request('/api/accounts/{0}/applications/{1}/actionsuppressions/{2}'.format(account_id,
+                                                                                               app_id,
+                                                                                               action_suppression_id),
+                            method="DELETE",
+                            use_json=False)
+
     def get_license_usage(self, account_id, license_module=None, start_time=None, end_time=None):
         """
         :param int account_id:
