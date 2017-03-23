@@ -525,6 +525,12 @@ class AppDynamicsClient(object):
         return self._v2_request(ActionSuppressionsResponse,
                                 '/accounts/{0}/applications/{1}/actionsuppressions'.format(account_id, app_id))
 
+    def get_action_suppression(self, account_id, app_id, action_suppression_id):
+        return self._v2_request(ActionSuppression,
+                                '/accounts/{0}/applications/{1}/actionsuppressions/{2}'.format(account_id,
+                                                                                               app_id,
+                                                                                               action_suppression_id))
+
     def get_license_usage(self, account_id, license_module=None, start_time=None, end_time=None):
         """
         :param int account_id:

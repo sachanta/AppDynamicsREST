@@ -20,3 +20,6 @@ c = AppDynamicsClient(args.url, args.username, args.password, args.account, args
 account = c.get_my_account()
 resp = c.get_action_suppressions(account.id, app_id=16)
 print(resp)
+
+resp = c.get_action_suppression(account.id, app_id=16, action_suppression_id=1)
+print(resp)

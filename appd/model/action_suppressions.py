@@ -42,7 +42,7 @@ class ActionSuppressionsResponse(JsonObject):
         print(json_dict)
         obj = super(ActionSuppressionsResponse, cls).from_json(json_dict)
         if 'actionSuppressions' in json_dict:
-            obj.actionSuppressions = ActionSuppressions.from_json(json_dict['actionSuppresions'])
+            obj.actionSuppressions = ActionSuppressions.from_json(json_dict['actionSuppressions'])
         else:
             obj.actionSuppressions = []
         return obj
