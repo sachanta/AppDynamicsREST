@@ -35,7 +35,7 @@ class ActionSuppressionsResponse(JsonObject):
     FIELDS = {}
 
     def __init__(self):
-        self.actionSupressions = ActionSuppressions()
+        self.actionSuppressions = ActionSuppressions()
 
     @classmethod
     def from_json(cls, json_dict):
@@ -43,6 +43,4 @@ class ActionSuppressionsResponse(JsonObject):
         obj = super(ActionSuppressionsResponse, cls).from_json(json_dict)
         if 'actionSuppressions' in json_dict:
             obj.actionSuppressions = ActionSuppressions.from_json(json_dict['actionSuppressions'])
-        else:
-            obj.actionSuppressions = []
         return obj

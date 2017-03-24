@@ -145,7 +145,7 @@ class AppDynamicsClient(object):
             self._session = Session()
         return self._session
 
-    def request(self, path, params=None, method='GET', use_json=True, query=True):
+    def request(self, path, params=None, method='GET', use_json=True, query=True, headers=None):
         if not path.startswith('/'):
             path = '/' + path
         url = self._base_url + path
@@ -161,9 +161,10 @@ class AppDynamicsClient(object):
             print('Retrieving ' + url, self._auth, params)
 
         if method == 'GET' or query:
-            r = self._get_session().request(method, url, auth=self._auth, params=params)
+            r = self._get_session().request(method, url, auth=self._auth, params=params, headers=headers)
         else:
-            headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
+            if not headers:
+                headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
             r = self._get_session().request(method, url, auth=self._auth, data=json.dumps(params), headers=headers)
 
         if r.status_code != requests.codes.ok:
@@ -537,6 +538,14 @@ class AppDynamicsClient(object):
                                                                                                action_suppression_id),
                             method="DELETE",
                             use_json=False)
+
+    def create_action_suppression(self, account_id, app_id, params):
+        return self.request('/api/accounts/{0}/applications/{1}/actionsuppressions'.format(account_id, app_id),
+                            method="POST",
+                            use_json=False,
+                            query=False,
+                            params=params,
+                            headers={'Content-Type': 'application/vnd.appd.cntrl+json;v=1'})
 
     def get_license_usage(self, account_id, license_module=None, start_time=None, end_time=None):
         """
