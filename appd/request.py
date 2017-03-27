@@ -215,9 +215,45 @@ class AppDynamicsClient(object):
         return cls.from_json(self.request('/controller/rest' + path, params, method, query=query))
 
     def set_controller_url(self, controllerURL):
+        """
+        Sets the base url for all email notification links
+
+        :param str controller_url: Base URL to use for email notification links
+        :returns: Success message
+        """
         param = {'controllerURL': controllerURL}
         return self._top_request(SetControllerUrlResponse,
                                  '/accounts/%s/update-controller-url' % self.account, param, 'POST', query=False)
+
+    def create_user(self,
+                    user_name,
+                    user_display_name,
+                    user_email,
+                    user_password,
+                    user_roles=None):
+        """
+        Creates a user
+
+        :param str user_name: User's name (required)
+        :param str user_display_name: How the user's name will show up in the UI (required)
+        :param str user_email: User's email (required)
+        :param str user_roles: Comma-separated list of roles
+            https://docs.appdynamics.com/display/PRO42/Roles+and+Permissions#RolesandPermissions-PredefinedRoles
+        :param str user_password: Required on create, not on update
+
+        :returns: Nothing on success, exception with HTTP error code on failure
+        """
+        params = {'user-name': user_name,
+                  'user-display-name': user_display_name,
+                  'user-email': user_email}
+
+        if (user_roles):
+            params.update({'user-roles': user_roles})
+
+        if (user_password):
+            params.update({'user-password': user_password})
+
+        return self.request('/controller/rest/users', params, 'POST', query=True, use_json=False)
 
     def get_config(self):
         """
