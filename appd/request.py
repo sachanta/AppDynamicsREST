@@ -264,6 +264,16 @@ class AppDynamicsClient(object):
         """
         return self._top_request(ConfigVariables, '/configuration')
 
+    def set_config(self, name, value):
+        """
+        Set a controller configuration value.
+
+        :returns: Configuration variables.
+        :rtype: appd.model.ConfigVariables
+        """
+        param = {'name': name, 'value': value}
+        return self._top_request(ConfigVariables, '/configuration', param, 'POST', query=True)
+
     def get_applications(self):
         """
         Get a list of all business applications.
