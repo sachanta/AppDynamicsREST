@@ -283,6 +283,18 @@ class AppDynamicsClient(object):
         """
         return self._top_request(Applications, '/applications')
 
+    def mark_nodes_historical(self, nodes):
+        """
+        Mark nodes historical
+
+        :param str nodes: CSV of node IDs
+
+        :returns: Nothing on success, exception with HTTP error code on failure
+        """
+        params = {'application-component-node-ids': nodes}
+
+        return self.request('/controller/rest/mark-nodes-historical', params, 'POST', query=True, use_json=False)
+
     # Application-level requests
 
     def _app_request(self, cls, path, app_id=None, params=None, method='GET', query=True, use_json=True):
