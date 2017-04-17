@@ -452,6 +452,33 @@ class AppDynamicsClient(object):
         path = self._app_path(app_id, '/events')
         return self.request(path, params, method='POST', query=True, use_json=False)
 
+    def exclude_bt_list(self, app_id, bts=[], exclude=True):
+        xml = '<business-transactions>'
+
+        for bt_id in bts:
+            xml = xml + '<business-transaction>'
+            xml = xml + '<id>{0}</id>'.format(bt_id)
+            xml = xml + '</business-transaction>'
+
+        xml = xml + '</business-transactions>'
+
+        params = {}
+        if (exclude):
+            params.update({'exclude': 'true'})
+        else:
+            params.update({'exclude': 'false'})
+
+        path = self._app_path(app_id, '/business-transactions')
+
+        if not path.startswith('/'):
+            path = '/' + path
+        url = self._base_url + path
+
+        headers = {'Content-type': 'text/xml', 'Accept': 'text/plain'}
+        r = self._get_session().request('POST', url, auth=self._auth, params=params, data=xml, headers=headers)
+
+        return r
+
     def get_snapshots(self, app_id=None, time_range_type=None, duration_in_mins=None,
                       start_time=None, end_time=None, **kwargs):
         """
