@@ -314,6 +314,34 @@ class AppDynamicsClient(object):
         r = self._get_session().request('POST', url, auth=self._auth, files=files)
         return r.text
 
+    def export_httprequest_action_templates(self):
+        """
+        Exports all email action templates from the controller, in JSON format
+
+        :returns: JSON string
+        """
+
+        return self.request('/controller/actiontemplate/httprequest', {}, 'GET', query=True, use_json=False)
+
+    def import_httprequest_action_templates(self, json):
+        """
+        Imports all email action templates into the controller, from JSON format
+
+        :param string json: Output of export_actions
+
+        :returns: JSON string, containing success or failure messages
+        """
+
+        path = '/controller/actiontemplate/httprequest'
+
+        if not path.startswith('/'):
+            path = '/' + path
+        url = self._base_url + path
+
+        files = {'file': ('actions.json', json)}
+        r = self._get_session().request('POST', url, auth=self._auth, files=files)
+        return r.text
+
     def get_config(self):
         """
         Retrieve the controller configuration.
