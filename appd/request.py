@@ -255,6 +255,37 @@ class AppDynamicsClient(object):
 
         return self.request('/controller/rest/users', params, 'POST', query=True, use_json=False)
 
+    def export_actions(self, application_id):
+        """
+        Exports all actions from the given app, in JSON format
+
+        :param int application_id: Application ID
+
+        :returns: JSON string
+        """
+
+        return self.request('/controller/actions/{0}'.format(application_id), {}, 'GET', query=True, use_json=False)
+
+    def import_actions(self, application_id, json):
+        """
+        Imports all actions into the given app, from JSON format
+
+        :param int application_id: Application ID
+        :param string json: Output of export_actions
+
+        :returns: JSON string, containing success or failure messages
+        """
+
+        path = '/controller/actions/{0}'.format(application_id)
+
+        if not path.startswith('/'):
+            path = '/' + path
+        url = self._base_url + path
+
+        files = {'file': ('actions.json', json)}
+        r = self._get_session().request('POST', url, auth=self._auth, files=files)
+        return r.text
+
     def get_config(self):
         """
         Retrieve the controller configuration.
