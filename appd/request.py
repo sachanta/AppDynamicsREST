@@ -255,6 +255,46 @@ class AppDynamicsClient(object):
 
         return self.request('/controller/rest/users', params, 'POST', query=True, use_json=False)
 
+    def export_health_rules(self, application_id, name=None):
+        """
+        Exports all health rules from the given app, in XML format
+
+        :param int application_id: Application ID
+        :param string name: Name of a particular health rule to export,
+            if omitted, all health rules will be exported
+        :returns: JSON string
+        """
+        params = {}
+        if (name):
+            params.update({'name': name})
+
+        return self.request('/controller/healthrules/{0}'.format(application_id),
+                            params, 'GET', query=True, use_json=False)
+
+    def import_health_rules(self, application_id, xml, overwrite=False):
+        """
+        Imports all health rules into the given app, from XML format
+
+        :param int application_id: Application ID
+        :param string xml: Output of export_health_rules
+
+        :returns: Plain text string, containing success or failure messages
+        """
+
+        params = {}
+        if (overwrite):
+            params.update({'overwrite': overwrite})
+
+        path = '/controller/healthrules/{0}'.format(application_id)
+
+        if not path.startswith('/'):
+            path = '/' + path
+        url = self._base_url + path
+
+        files = {'file': ('healthrules.xml', xml)}
+        r = self._get_session().request('POST', url, auth=self._auth, params=params, files=files)
+        return r.text
+
     def export_actions(self, application_id):
         """
         Exports all actions from the given app, in JSON format
