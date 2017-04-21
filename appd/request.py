@@ -299,7 +299,7 @@ class AppDynamicsClient(object):
         """
         Imports all email action templates into the controller, from JSON format
 
-        :param string json: Output of export_actions
+        :param string json: Output of export_email_action_templates
 
         :returns: JSON string, containing success or failure messages
         """
@@ -316,7 +316,7 @@ class AppDynamicsClient(object):
 
     def export_httprequest_action_templates(self):
         """
-        Exports all email action templates from the controller, in JSON format
+        Exports all httprequest action templates from the controller, in JSON format
 
         :returns: JSON string
         """
@@ -325,9 +325,9 @@ class AppDynamicsClient(object):
 
     def import_httprequest_action_templates(self, json):
         """
-        Imports all email action templates into the controller, from JSON format
+        Imports all httprequest action templates into the controller, from JSON format
 
-        :param string json: Output of export_actions
+        :param string json: Output of export_httprequest_action_templates
 
         :returns: JSON string, containing success or failure messages
         """
