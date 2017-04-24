@@ -295,6 +295,52 @@ class AppDynamicsClient(object):
         r = self._get_session().request('POST', url, auth=self._auth, params=params, files=files)
         return r.text
 
+    def export_entry_points(self, application_id, rule_type, tier=None):
+        """
+        Exports all entry points from the given app, in XML format
+
+        :param int application_id: Application ID
+        :param string rule_type: one of auto, custom, or exclude
+        :param string tier: name of the tier to export from, optional
+
+        :returns: XML string
+        """
+        url = '/controller/transactiondetection/{0}/'.format(application_id)
+
+        if (tier):
+            url = url + tier + '/'
+
+        url = url + rule_type
+
+        return self.request(url, {}, 'GET', query=True, use_json=False)
+
+    def import_entry_points(self, application_id, rule_type, xml, tier=None):
+        """
+        Imports all entry points into the given app, from XML format
+
+        :param int application_id: Application ID
+        :param string rule_type: one of auto, custom, or exclude
+        :param string xml: Output of export_entry_points
+        :param string tier: name of the tier to export from, optional
+
+        :returns: JSON string, containing success or failure messages
+        """
+
+        path = '/controller/transactiondetection/{0}/'.format(application_id)
+
+        if (tier):
+            path = path + tier + '/'
+
+        path = path + rule_type
+
+        if not path.startswith('/'):
+            path = '/' + path
+        url = self._base_url + path
+
+        files = {'file': ('entrypoints.xml', xml)}
+        r = self._get_session().request('POST', url, auth=self._auth, files=files)
+        return r.text
+
     def export_actions(self, application_id):
         """
         Exports all actions from the given app, in JSON format
