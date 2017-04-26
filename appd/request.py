@@ -396,6 +396,40 @@ class AppDynamicsClient(object):
         r = self._get_session().request('POST', url, auth=self._auth, files=files)
         return r.text
 
+    def export_analytics_dynamic_service_configs(self, application_id):
+        """
+        Exports all analytics dynamics service configs from the given app, in XML format
+        Only available on controllers 4.3+
+
+        :param int application_id: Application ID
+
+        :returns: JSON string
+        """
+
+        return self.request('/controller/analyticsdynamicservice/{0}'.format(application_id),
+                            {}, 'GET', query=True, use_json=False)
+
+    def import_analytics_dynamic_service_configs(self, application_id, xml):
+        """
+        Imports all actions into the given app, from JSON format
+        Only available on controllers 4.3+
+
+        :param int application_id: Application ID
+        :param string xml: Output of export_analytics_dynamic_service_configs
+
+        :returns: JSON string, containing success or failure messages
+        """
+
+        path = '/controller/analyticsdynamicservice/{0}'.format(application_id)
+
+        if not path.startswith('/'):
+            path = '/' + path
+        url = self._base_url + path
+
+        files = {'file': ('actions.xml', xml)}
+        r = self._get_session().request('POST', url, auth=self._auth, files=files)
+        return r.text
+
     def export_actions(self, application_id):
         """
         Exports all actions from the given app, in JSON format
