@@ -498,6 +498,31 @@ class AppDynamicsClient(object):
 
         return self.upload(path, json)
 
+    def export_policies(self, application_id):
+        """
+        Exports all policies from the given app, in JSON format
+
+        :param int application_id: Application ID
+
+        :returns: JSON string
+        """
+
+        return self.request('/controller/actions/{0}'.format(application_id), {}, 'GET', query=True, use_json=False)
+
+    def import_policies(self, application_id, json):
+        """
+        Imports all policies into the given app, from JSON format
+
+        :param int application_id: Application ID
+        :param string json: Output of export_policies
+
+        :returns: JSON string, containing success or failure messages
+        """
+
+        path = '/controller/actions/{0}'.format(application_id)
+
+        return self.upload(path, json)
+
     def export_actions(self, application_id):
         """
         Exports all actions from the given app, in JSON format
