@@ -145,6 +145,46 @@ class AppDynamicsClient(object):
             self._session = Session()
         return self._session
 
+    def upload(self, path, data, filename='default'):
+        """
+        Workaround a bug between requests file upload boundary format
+        and the expected format at the server
+        """
+
+        import pycurl
+        import base64
+        try:
+            from io import BytesIO
+        except ImportError:
+            from StringIO import StringIO as BytesIO
+
+        if not path.startswith('/'):
+            path = '/' + path
+        url = self._base_url + path
+
+        c = pycurl.Curl()
+        b = BytesIO()
+
+        c.setopt(c.WRITEDATA, b)
+        c.setopt(c.URL, url)
+
+        auth = base64.encodestring('%s:%s' % self._auth).replace('\n', '')
+
+        c.setopt(c.HTTPHEADER, [
+            'Authorization: Basic {0}'.format(auth)
+        ])
+        c.setopt(c.HTTPPOST, [
+            ('fileupload', (
+                c.FORM_BUFFER, filename,
+                c.FORM_BUFFERPTR, data,
+            )),
+        ])
+
+        c.perform()
+        c.close()
+
+        return b.getvalue()
+
     def request(self, path, params=None, method='GET', use_json=True, query=True, headers=None):
         if not path.startswith('/'):
             path = '/' + path
@@ -429,6 +469,34 @@ class AppDynamicsClient(object):
         files = {'file': ('actions.xml', xml)}
         r = self._get_session().request('POST', url, auth=self._auth, files=files)
         return r.text
+
+    def export_custom_dashboard(self, dashboard_id):
+        """
+        Exports custom dashboard with the given ID, in JSON format
+
+        :param int dashboard_id: custom dashboard ID
+
+        :returns: JSON string
+        """
+
+        params = {}
+        if (dashboard_id):
+            params.update({'dashboardId': dashboard_id})
+
+        return self.request('/controller/CustomDashboardImportExportServlet', params, 'GET', query=True, use_json=False)
+
+    def import_custom_dashboard(self, json):
+        """
+        Imports custom dashboard, from JSON format
+
+        :param string json: Output of export_custom_dashboard
+
+        :returns: JSON string, containing success or failure messages
+        """
+
+        path = '/controller/CustomDashboardImportExportServlet'
+
+        return self.upload(path, json)
 
     def export_actions(self, application_id):
         """
