@@ -17,6 +17,7 @@ from appd.model.license_module import *
 from appd.model.hourly_license_usage import *
 from appd.model.license_usage import *
 from appd.model.tier import *
+from appd.model.backend import *
 from appd.model.metric_treenode import *
 from appd.model.business_transaction import *
 from appd.model.policy_violation import *
@@ -668,6 +669,17 @@ class AppDynamicsClient(object):
         :rtype: appd.model.BusinessTransactions
         """
         return self._app_request(BusinessTransactions, '/business-transactions', app_id, {'exclude': excluded})
+
+    def get_backends(self, app_id=None):
+        """
+        Get the list of all backends in an application.
+
+        :param int app_id: Application ID to retrieve backends for. If :const:`None`, the value stored in the
+          `app_id` property will be used.
+        :return: A :class:`Backends <appd.model.Backends>` object, representing a collection of backends.
+        :rtype: appd.model.Backends
+        """
+        return self._app_request(Backends, '/backends', app_id)
 
     def get_tiers(self, app_id=None):
         """
