@@ -27,6 +27,7 @@ from appd.model.node import *
 from appd.model.set_controller_url import *
 from appd.model.event import *
 from appd.model.action_suppressions import *
+from appd.model.audit_history import *
 
 
 class AppDynamicsClient(object):
@@ -265,6 +266,29 @@ class AppDynamicsClient(object):
         param = {'controllerURL': controllerURL}
         return self._top_request(SetControllerUrlResponse,
                                  '/accounts/%s/update-controller-url' % self.account, param, 'POST', query=False)
+
+    def get_audit_history(self, start_time, end_time, time_zone_id=None):
+        """
+        Gathers audit history for up to a 24h time period
+
+        :param str start_time: Start time in the format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        :param str end_time: End time in the format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        :param str time_zone_id: Optional, time zone in tz format
+
+        :return: A :class:`AuditHistory <appd.model.AuditHistory>` object, representing a collection of audits.
+        :rtype: appd.model.AuditHistory
+        """
+
+        params = {
+            'startTime': start_time,
+            'endTime': end_time
+        }
+
+        if (time_zone_id):
+            params.update({'timeZoneId': time_zone_id})
+
+        return AuditHistory.from_json(self.request('/controller/ControllerAuditHistory',
+                                                   params, 'GET', query=True, use_json=True))
 
     def create_user(self,
                     user_name,
