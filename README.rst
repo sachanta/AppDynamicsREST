@@ -2,7 +2,7 @@
 AppDynamics REST API Library
 ============================
 
-Current version: 0.4.16
+Current version: 0.4.17
 
 
 Introduction
