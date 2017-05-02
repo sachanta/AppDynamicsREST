@@ -998,6 +998,16 @@ class AppDynamicsClient(object):
         """
         return self._v2_request(LicenseModules, '/accounts/{0}/licensemodules'.format(account_id))
 
+    def set_metric_retention(self, account_id, days, app_id=None):
+        path = '/controller/api/accounts/{0}/'.format(account_id)
+
+        if (app_id):
+            path = path + 'applications/{0}/'.format(app_id)
+
+        path = path + 'metricstaleduration/{0}'.format(days)
+
+        return self.request(path, method="POST", use_json=False)
+
     def get_action_suppressions(self, account_id, app_id):
         return self._v2_request(ActionSuppressionsResponse,
                                 '/accounts/{0}/applications/{1}/actionsuppressions'.format(account_id, app_id))
