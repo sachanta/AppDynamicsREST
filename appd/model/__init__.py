@@ -5,7 +5,7 @@ Model classes for AppDynamics REST API
 """
 
 
-from six.moves import UserList
+from future.moves.collections import UserList
 
 
 def _filter_func(obj, pred):

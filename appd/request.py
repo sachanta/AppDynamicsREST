@@ -70,7 +70,7 @@ class AppDynamicsClient(object):
     STALLS = 'Stall Count'
 
     def __init__(self, base_url='http://localhost:8090', username='user1', password='welcome',
-                 account='customer1', debug=False):
+                 account='customer1', debug=False, verify=True):
         """
         Creates a new instance of the client.
 
@@ -88,8 +88,8 @@ class AppDynamicsClient(object):
 
         self._username, self._password, self._account, self._app_id, self._session = '', '', '', None, None
         self._base_url = ''
-        (self.base_url, self.username, self.password, self.account, self.debug) = (base_url, username, password,
-                                                                                   account, debug)
+        (self.base_url, self.username, self.password, self.account, self.debug, self.verify) = (base_url, username, password,
+                                                                                   account, debug, verify)
 
     @property
     def base_url(self):
@@ -145,6 +145,7 @@ class AppDynamicsClient(object):
         if not self._session:
             from requests.sessions import Session
             self._session = Session()
+            self._session.verify = self.verify
         return self._session
 
     def upload(self, path, data, filename='default'):
