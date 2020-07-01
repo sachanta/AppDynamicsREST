@@ -24,6 +24,7 @@ from appd.model.policy_violation import *
 from appd.model.snapshot import *
 from appd.model.metric_data import *
 from appd.model.node import *
+from appd.model.user import *
 from appd.model.set_controller_url import *
 from appd.model.event import *
 from appd.model.action_suppressions import *
@@ -675,6 +676,37 @@ class AppDynamicsClient(object):
         params = {'application-component-node-ids': nodes}
 
         return self.request('/controller/rest/mark-nodes-historical', params, 'POST', query=True, use_json=False)
+
+    # RBAC requests
+
+    def _rbac_v1_request_users(self, cls, path, params=None, method='GET', query=True, use_json=True):
+        obj = self.request('/controller/api/rbac/v1' + path, params, method=method, query=query, use_json=use_json )
+        for key in obj:
+            value = obj[key]
+        return cls.from_json(value)
+
+    def _rbac_v1_request(self, cls, path, params=None, method='GET', query=True, use_json=True):
+        return cls.from_json(self.request('/controller/api/rbac/v1' + path, params, method=method, query=query, use_json=use_json ))
+
+    def get_users(self):
+        """
+        Retrieves list of users in the controller.
+
+        :return: A :class:'Users <appd.model.Users>' object, representing a collection of users
+        :rtype: appd.model.Users
+        """
+        return self._rbac_v1_request_users(Users, '/users')
+
+    def get_user(self, user_id):
+        """
+        Retrieves details about a single user.
+
+        :param user_id: ID or name of the user to retrieve.
+        :return: A single User object.
+        :rtype: appd.model.User
+        """
+        return self._rbac_v1_request(User, '/users/%s' % user_id)
+
 
     # Application-level requests
 
