@@ -17,7 +17,11 @@ __copyright__ = 'Copyright (c) 2013-2017 AppDynamics Inc.'
 args = parse_argv()
 c = AppDynamicsClient(args.url, args.username, args.password, args.account, args.verbose)
 
-resp = c.export_actions(5)
-print(resp)
-resp = c.import_actions(5, resp)
-print(resp)
+apps = c.get_applications()
+if len(apps) > 0:
+    resp = c.export_actions(apps[0].id)
+    print(resp)
+    resp = c.import_actions(apps[0].id, resp)
+    print(resp)
+else:
+    print('no applications found!')
