@@ -17,20 +17,25 @@ __copyright__ = 'Copyright (c) 2013-2017 AppDynamics Inc.'
 args = parse_argv()
 c = AppDynamicsClient(args.url, args.username, args.password, args.account, args.verbose)
 
-resp = c.create_event(app_id=16,
-                      summary='Event 1',
-                      comment='This is an event created by the Python SDK',
-                      severity='INFO',
-                      eventtype='APPLICATION_CONFIG_CHANGE')
-print(resp)
+apps = c.get_applications()
+if len(apps) > 0:
+    resp = c.create_event(apps[0].id,
+                          summary='Event 1',
+                          comment='This is an event created by the Python SDK',
+                          severity='INFO',
+                          eventtype='APPLICATION_CONFIG_CHANGE')
+    print(resp)
+    resp = c.create_event(app_id=10,
+                          summary='Custom Event 1',
+                          comment='This is an event created by the Python SDK',
+                          severity='INFO',
+                          eventtype='CUSTOM',
+                          customeventtype='MYCUSTOMEVENT',
+                          node="Node_8000",
+                          tier="ECommerce Server",
+                          bt="ViewItems.getAllItems")
+    print(resp)
 
-resp = c.create_event(app_id=16,
-                      summary='Custom Event 1',
-                      comment='This is an event created by the Python SDK',
-                      severity='INFO',
-                      eventtype='CUSTOM',
-                      customeventtype='MYCUSTOMEVENT',
-                      node="python-node-1",
-                      tier="python",
-                      bt="/admin")
-print(resp)
+
+else:
+    print('no applications found!')
