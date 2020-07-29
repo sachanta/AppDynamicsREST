@@ -17,9 +17,13 @@ __copyright__ = 'Copyright (c) 2013-2017 AppDynamics Inc.'
 args = parse_argv()
 c = AppDynamicsClient(args.url, args.username, args.password, args.account, args.verbose)
 
-resp = c.get_events(app_id=16,
-                    event_types='APPLICATION_CONFIG_CHANGE',
-                    severities='INFO,WARN,ERROR',
-                    time_range_type='BEFORE_NOW',
-                    duration_in_mins='60000')
-print(resp)
+apps = c.get_applications()
+if len(apps) > 0:
+    resp = c.get_events(apps[0].id,
+                        event_types='APPLICATION_CONFIG_CHANGE',
+                        severities='INFO,WARN,ERROR',
+                        time_range_type='BEFORE_NOW',
+                        duration_in_mins='60000')
+    print(resp)
+else:
+    print('Application, not found!')

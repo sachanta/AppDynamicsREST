@@ -19,12 +19,9 @@ c = AppDynamicsClient(args.url, args.username, args.password, args.account, args
 
 apps = c.get_applications()
 if len(apps) > 0:
-    resp = c.get_backends(apps[0].id)
+    resp = c.export_actions(apps[0].id)
     print(resp)
-    print(resp.by_exit_point_type("HTTP"))
-    for backend in resp:
-        for prop in backend.properties:
-            print(prop['name'])
-            print(prop['value'])
+    resp = c.import_actions(apps[0].id, resp)
+    print(resp)
 else:
     print('Application, not found!')

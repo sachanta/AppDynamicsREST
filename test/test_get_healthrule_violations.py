@@ -19,12 +19,7 @@ c = AppDynamicsClient(args.url, args.username, args.password, args.account, args
 
 apps = c.get_applications()
 if len(apps) > 0:
-    resp = c.get_backends(apps[0].id)
+    resp = c.get_healthrule_violations(apps[0].id, time_range_type='BEFORE_NOW', duration_in_mins=60)
     print(resp)
-    print(resp.by_exit_point_type("HTTP"))
-    for backend in resp:
-        for prop in backend.properties:
-            print(prop['name'])
-            print(prop['value'])
 else:
     print('Application, not found!')

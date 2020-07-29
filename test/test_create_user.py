@@ -13,10 +13,13 @@ from appd.request import AppDynamicsClient
 __author__ = 'Kyle Furlong'
 __copyright__ = 'Copyright (c) 2013-2017 AppDynamics Inc.'
 
-
 args = parse_argv()
 c = AppDynamicsClient(args.url, args.username, args.password, args.account, args.verbose)
 
-resp = c.create_user('Ash', 'AsherBasher', 'asher@nowhere.nowhen',
-                     user_password='asher', user_roles='Administrator,Universal Agent User')
-print(resp)
+apps = c.get_applications()
+if len(apps) > 0:
+    resp = c.create_user('John', 'Doe', 'john@nowhere.nowhen',
+                         user_password='johndoe', user_roles='Administrator,Universal Agent User')
+    print(resp)
+else:
+    print('Application, not found!')
