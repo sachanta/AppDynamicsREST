@@ -19,10 +19,15 @@ class JsonObject(object):
 
     FIELDS = {}
 
+    # Added the check to below function to avoid Key_errors, where key we are checking for is not returned by the server
+    # 'if json_dict.has_key(k):'
+    # For instance, 'user' object has description field, but when we get the list of users; the description field is not
+    # sent by server. Description field is present, only when getting the info of an individual user.
     @classmethod
     def _set_fields_from_json_dict(cls, obj, json_dict):
         for k, v in list(obj.FIELDS.items()):
-            obj.__setattr__(k, json_dict[v or k])
+            if json_dict.has_key(k):
+                obj.__setattr__(k, json_dict[v or k])
 
     @classmethod
     def from_json(cls, json_dict):

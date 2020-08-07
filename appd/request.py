@@ -28,7 +28,9 @@ from appd.model.set_controller_url import *
 from appd.model.event import *
 from appd.model.action_suppressions import *
 from appd.model.audit_history import *
-
+from appd.model.role import *
+from appd.model.group import *
+from appd.model.user import *
 
 class AppDynamicsClient(object):
     """
@@ -731,6 +733,84 @@ class AppDynamicsClient(object):
 
         path = ('/tiers/%s/nodes' % tier_id) if tier_id else '/nodes'
         return self._app_request(Nodes, path, app_id)
+
+    # RBAC requests
+
+    def _rbac_v1_request_set(self, cls, path, params=None, method='GET', query=True, use_json=True):
+        obj = self.request('/controller/api/rbac/v1' + path, params, method=method, query=query, use_json=use_json)
+        for key in obj:
+            if obj[key] is not None:
+                value = obj[key]
+        return cls.from_json(value)
+
+    def _rbac_v1_request(self, cls, path, params=None, method='GET', query=True, use_json=True):
+        return cls.from_json(
+            self.request('/controller/api/rbac/v1' + path, params, method=method, query=query, use_json=use_json))
+
+    def get_roles(self):
+        """
+        Retrieves the list of roles in the Controller.
+
+        :return: A :class:`Roles <appd.model.Roles>` object, representing a collection of roles.
+        :rtype: appd.model.Roles
+        """
+
+        path = '/roles'
+        return self._rbac_v1_request_set(Roles, path)
+
+    def get_role(self, role_id):
+        """
+        Retrieves details about a single role.
+
+        :param role_id: ID or name of the role to retrieve.
+        :return: A single Role object.
+        :rtype: appd.model.Role
+        """
+        return self._rbac_v1_request(Role, '/roles/%s' % role_id)
+
+    def get_groups(self):
+        """
+        Retrieves the list of groups in the application.
+
+        :return: A :class:`Groups <appd.model.Groups>` object, representing a collection of Groups.
+        :rtype: appd.model.Groups
+        """
+
+        path = '/groups'
+        return self._rbac_v1_request_set(Groups, path)
+
+    def get_group(self, group_id):
+        """
+        Retrieves details about a single group.
+
+        :param group_id: ID or name of the group to retrieve.
+        :return: A single Group object.
+        :rtype: appd.model.Group
+        """
+        return self._rbac_v1_request(Group, '/groups/%s' % group_id)
+
+    def get_users(self):
+        """
+        Retrieves the list of users in the Controller.
+
+        :return: A :class:`Users <appd.model.Roles>` object, representing a collection of users.
+        :rtype: appd.model.Users
+        """
+
+        path = '/users'
+        return self._rbac_v1_request_set(Users, path)
+
+    def get_user(self, user_id):
+        """
+        Retrieves details about a single user.
+
+        :param user_id: ID or name of the user to retrieve.
+        :return: A single User object.
+        :rtype: appd.model.User
+        """
+        return self._rbac_v1_request(User, '/users/%s' % user_id)
+
+    # rbac requests end
 
     def get_node(self, node_id, app_id=None):
         """
