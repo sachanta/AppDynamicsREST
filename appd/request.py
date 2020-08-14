@@ -734,6 +734,17 @@ class AppDynamicsClient(object):
         path = ('/tiers/%s/nodes' % tier_id) if tier_id else '/nodes'
         return self._app_request(Nodes, path, app_id)
 
+    def get_node(self, node_id, app_id=None):
+        """
+        Retrieves details about a single node.
+
+        :param node_id: ID or name of the node to retrieve.
+        :param app_id: Application ID to search for the node.
+        :return: A single Node object.
+        :rtype: appd.model.Node
+        """
+        return self._app_request(Node, '/nodes/%s' % node_id, app_id)
+
     # RBAC requests
 
     def _rbac_v1_request_set(self, cls, path, params=None, method='GET', query=True, use_json=True):
@@ -762,7 +773,7 @@ class AppDynamicsClient(object):
         """
         Retrieves details about a single role.
 
-        :param role_id: ID or name of the role to retrieve.
+        :param role_id: ID of the role to retrieve.
         :return: A single Role object.
         :rtype: appd.model.Role
         """
@@ -783,7 +794,7 @@ class AppDynamicsClient(object):
         """
         Retrieves details about a single group.
 
-        :param group_id: ID or name of the group to retrieve.
+        :param group_id: ID of the group to retrieve.
         :return: A single Group object.
         :rtype: appd.model.Group
         """
@@ -804,24 +815,13 @@ class AppDynamicsClient(object):
         """
         Retrieves details about a single user.
 
-        :param user_id: ID or name of the user to retrieve.
+        :param user_id: ID of the user to retrieve.
         :return: A single User object.
         :rtype: appd.model.User
         """
         return self._rbac_v1_request(User, '/users/%s' % user_id)
 
     # rbac requests end
-
-    def get_node(self, node_id, app_id=None):
-        """
-        Retrieves details about a single node.
-
-        :param node_id: ID or name of the node to retrieve.
-        :param app_id: Application ID to search for the node.
-        :return: A single Node object.
-        :rtype: appd.model.Node
-        """
-        return self._app_request(Node, '/nodes/%s' % node_id, app_id)
 
     def _validate_time_range(self, time_range_type, duration_in_mins, start_time, end_time):
 

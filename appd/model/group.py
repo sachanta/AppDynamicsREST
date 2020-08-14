@@ -19,9 +19,9 @@ class Group(JsonObject):
 
 class Groups(JsonList):
     """
-        Represents a collection of :class:Group objects. Extends :class:UserList, so it supports the
-        standard array index and :keyword:`for` semantics.
-        """
+    Represents a collection of :class:Group objects. Extends :class:UserList, so it supports the
+    standard array index and :keyword:`for` semantics.
+    """
 
     def __init__(self, initial_list=None):
         super(Groups, self).__init__(Group, initial_list)

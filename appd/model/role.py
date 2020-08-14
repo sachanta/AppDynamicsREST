@@ -19,9 +19,9 @@ class Role(JsonObject):
 
 class Roles(JsonList):
     """
-        Represents a collection of :class:Role objects. Extends :class:UserList, so it supports the
-        standard array index and :keyword:`for` semantics.
-        """
+    Represents a collection of :class:Role objects. Extends :class:UserList, so it supports the
+    standard array index and :keyword:`for` semantics.
+    """
 
     def __init__(self, initial_list=None):
         super(Roles, self).__init__(Role, initial_list)
