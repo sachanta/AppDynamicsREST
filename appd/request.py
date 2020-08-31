@@ -32,6 +32,7 @@ from appd.model.role import *
 from appd.model.group import *
 from appd.model.user import *
 
+
 class AppDynamicsClient(object):
     """
     Main class that wraps around the REST API to make it easier to send requests
@@ -747,6 +748,9 @@ class AppDynamicsClient(object):
 
     # RBAC requests
 
+    rbac_path = '/controller/api/rbac/v1'
+
+    # retrieving a set of objects - users, roles etc.
     def _rbac_v1_request_set(self, cls, path, params=None, method='GET', query=True, use_json=True):
         obj = self.request('/controller/api/rbac/v1' + path, params, method=method, query=query, use_json=use_json)
         for key in obj:
@@ -754,9 +758,131 @@ class AppDynamicsClient(object):
                 value = obj[key]
         return cls.from_json(value)
 
+    # retrieving a single object.
     def _rbac_v1_request(self, cls, path, params=None, method='GET', query=True, use_json=True):
         return cls.from_json(
             self.request('/controller/api/rbac/v1' + path, params, method=method, query=query, use_json=use_json))
+
+    # this function is used for creating objects or modifying existing objects, such as update or delete
+    def _rbac_v1_create_request(self, path, params=None, method='POST', query=False, use_json=True):
+        if not path.startswith('/'):
+            path = '/' + path
+        # url = self._base_url + path
+        url = self._base_url + '/controller/api/rbac/v1' + path
+
+        if self.debug:
+            print('Retrieving ' + url, self._auth, params)
+
+        if method == 'POST' or 'PUT':
+            headers = {
+                'Content-Type': 'application/vnd.appd.cntrl+json;v=1',
+            }
+            r = self._get_session().request(method, url, auth=self._auth, data=params, headers=headers)
+
+        if method == 'DELETE':
+            r = self._get_session().request(method, url, auth=self._auth)
+            print(r)
+
+        if r.status_code != requests.codes.ok:
+            print(url, file=sys.stderr)
+            r.raise_for_status()
+
+        return r.json() if use_json else r.text
+
+    def add_user_to_group(self, group_id=None, user_id=None):
+        """
+        Adds user to a group
+
+        :param group_id:
+        :param user_id:
+        :return: HTTP Status code
+        """
+        path = '/controller/api/rbac/v1/groups/%s/users/%s' % (group_id, user_id)
+        url = self._base_url + path
+
+        headers = {
+            'Content-Type': 'application/vnd.appd.cntrl+json;v=1',
+        }
+        return self._get_session().request('PUT', url, auth=self._auth, headers=headers)
+
+    def remove_user_from_group(self, group_id=None, user_id=None):
+        """
+        Removes user from a group
+
+        :param group_id:
+        :param user_id:
+        :return: HTTP Status code
+        """
+        path = '/controller/api/rbac/v1/groups/%s/users/%s' % (group_id, user_id)
+        url = self._base_url + path
+
+        headers = {
+            'Content-Type': 'application/vnd.appd.cntrl+json;v=1',
+        }
+        return self._get_session().request('DELETE', url, auth=self._auth, headers=headers)
+
+    def add_role_to_user(self, role_id=None, user_id=None):
+        """
+        Adds role to a user
+        :param role_id:
+        :param user_id:
+        :return: HTTP Status code
+        """
+        path = '/controller/api/rbac/v1/roles/%s/users/%s' % (role_id, user_id)
+        url = self._base_url + path
+
+        headers = {
+            'Content-Type': 'application/vnd.appd.cntrl+json;v=1',
+        }
+        return self._get_session().request('PUT', url, auth=self._auth, headers=headers)
+
+    def remove_role_from_user(self, role_id=None, user_id=None):
+        """
+        Removes role from a user
+
+        :param role_id:
+        :param user_id:
+        :return: HTTP Status code
+        """
+        path = '/controller/api/rbac/v1/roles/%s/users/%s' % (role_id, user_id)
+        url = self._base_url + path
+
+        headers = {
+            'Content-Type': 'application/vnd.appd.cntrl+json;v=1',
+        }
+        return self._get_session().request('DELETE', url, auth=self._auth, headers=headers)
+
+    def add_role_to_group(self, role_id=None, group_id=None):
+        """
+        Adds role to a group.
+
+        :param role_id: Role id
+        :param group_id: Group id
+        :return: HTTP Status code
+        """
+        path = '/controller/api/rbac/v1/roles/%s/groups/%s' % (role_id, group_id)
+        url = self._base_url + path
+
+        headers = {
+            'Content-Type': 'application/vnd.appd.cntrl+json;v=1',
+        }
+        return self._get_session().request('PUT', url, auth=self._auth, headers=headers)
+
+    def remove_role_from_group(self, role_id=None, group_id=None):
+        """
+        Removes role from a group
+
+        :param role_id: Role id of the role to be added
+        :param group_id: Group id
+        :return: HTTP Status code
+        """
+        path = '/controller/api/rbac/v1/roles/%s/groups/%s' % (role_id, group_id)
+        url = self._base_url + path
+
+        headers = {
+            'Content-Type': 'application/vnd.appd.cntrl+json;v=1',
+        }
+        return self._get_session().request('DELETE', url, auth=self._auth, headers=headers)
 
     def get_roles(self):
         """
@@ -766,10 +892,9 @@ class AppDynamicsClient(object):
         :rtype: appd.model.Roles
         """
 
-        path = '/roles'
-        return self._rbac_v1_request_set(Roles, path)
+        return self._rbac_v1_request_set(Roles, '/roles')
 
-    def get_role(self, role_id):
+    def get_role_by_id(self, role_id):
         """
         Retrieves details about a single role.
 
@@ -779,6 +904,16 @@ class AppDynamicsClient(object):
         """
         return self._rbac_v1_request(Role, '/roles/%s' % role_id)
 
+    def get_role_by_name(self, role_name):
+        """
+        Retrieves details about a single role.
+
+        :param role_name: Name of the role to retrieve.
+        :return: A single Role object.
+        :rtype: appd.model.Role
+        """
+        return self._rbac_v1_request(Role, '/roles/name/%s' % role_name)
+
     def get_groups(self):
         """
         Retrieves the list of groups in the application.
@@ -787,10 +922,9 @@ class AppDynamicsClient(object):
         :rtype: appd.model.Groups
         """
 
-        path = '/groups'
-        return self._rbac_v1_request_set(Groups, path)
+        return self._rbac_v1_request_set(Groups, '/groups')
 
-    def get_group(self, group_id):
+    def get_group_by_id(self, group_id):
         """
         Retrieves details about a single group.
 
@@ -800,6 +934,16 @@ class AppDynamicsClient(object):
         """
         return self._rbac_v1_request(Group, '/groups/%s' % group_id)
 
+    def get_group_by_name(self, group_name):
+        """
+        Retrieves details about a single group.
+
+        :param group_id: ID of the group to retrieve.
+        :return: A single Group object.
+        :rtype: appd.model.Group
+        """
+        return self._rbac_v1_request(Group, '/groups/name/%s' % group_name)
+
     def get_users(self):
         """
         Retrieves the list of users in the Controller.
@@ -808,10 +952,9 @@ class AppDynamicsClient(object):
         :rtype: appd.model.Users
         """
 
-        path = '/users'
-        return self._rbac_v1_request_set(Users, path)
+        return self._rbac_v1_request_set(Users, '/users')
 
-    def get_user(self, user_id):
+    def get_user_by_id(self, user_id):
         """
         Retrieves details about a single user.
 
@@ -820,6 +963,148 @@ class AppDynamicsClient(object):
         :rtype: appd.model.User
         """
         return self._rbac_v1_request(User, '/users/%s' % user_id)
+
+    def get_user_by_name(self, user_name):
+        """
+        Retrieves details about a single user.
+
+        :param user_name: Name of the user to retrieve.
+        :return: A single User object.
+        :rtype: appd.model.User
+        """
+        return self._rbac_v1_request(User, '/users/name/%s' % user_name)
+
+    def create_user_v1(self,
+                    user_name,
+                    user_display_name,
+                    user_email,
+                    user_password,
+                    security_provider_type):
+        """
+        Creates a user
+
+        :param security_provider_type: "INTERNAL" (required)
+        :param str user_name: User's name (required)
+        :param str user_display_name: How the user's name will show up in the UI (required)
+        :param str user_email: User's email (optional)
+        :param str user_password: Required on create, not on update (required)
+
+        :returns: returns newly created user on success, exception with HTTP error code on failure
+        """
+        data = '{"name": "' + user_name + '", "security_provider_type": "INTERNAL", "displayName": "' + user_display_name + '", "password": "' + user_password + '", "email": "' + user_email + '"}'
+
+        return self._rbac_v1_create_request('/users', data)
+
+    def update_user(self,
+                    user_id,
+                    user_name,
+                    displayName):
+        """
+        Updates a user
+
+        :param str user_id: User's id (required)
+        :param str user_name: User's name (required)
+        :param str displayName: display name of the user (required)
+
+        :returns: returns newly created group on success, exception with HTTP error code on failure
+        """
+        data = '{"id": ' + str(user_id) + ', "name": "' + user_name + '", "displayName": "' + displayName\
+               + '", "security_provider_type": "INTERNAL"}'
+        # _rbac_post_request(self, path, params=None, method='POST', use_json=True, query=True, headers=None):
+        return self._rbac_v1_create_request('/users/%s' % user_id, data, 'PUT')
+
+    def delete_user(self, user_id):
+        """
+        deletes a single user.
+
+        :param user_id: ID of the user to delete.
+        """
+        return self._rbac_v1_create_request('/users/%s' % user_id, method='DELETE', use_json=False)
+
+    def create_role(self,
+                    role_name,
+                    role_description):
+        """
+        Creates a role
+
+        :param str role_name: Role's name (required)
+        :param str role_description: Description of the role (not required)
+
+        :returns: returns newly created role on success, exception with HTTP error code on failure
+        """
+        data = '{"name": "' + role_name + '", "description": "' + role_description + '"}'
+
+        return self._rbac_v1_create_request('/roles', data)
+
+    def update_role(self,
+                    role_id,
+                    role_name,
+                    role_description):
+        """
+        Updates a role
+
+        :param str role_id: Role's id (required)
+        :param str role_name: Role's name (required)
+        :param str role_description: Description of the role (not required)
+
+        :returns: returns newly created role on success, exception with HTTP error code on failure
+        """
+        data = '{"id": ' + str(role_id) + ', "name": "' + role_name + '", "description": "' + role_description + '"}'
+        return self._rbac_v1_create_request('/roles/%s' % role_id, data, 'PUT')
+
+    def delete_role(self, role_id):
+        """
+        deletes a single role.
+
+        :param role_id: ID of the role to delete.
+        """
+        return self._rbac_v1_create_request('/roles/%s' % role_id, method='DELETE', use_json=False)
+
+    def create_group(self,
+                    group_name,
+                    group_description):
+        """
+        Creates a group
+
+        :param str group_name: Group's name (required)
+        :param str group_description: Description of the group (not required)
+        :param str security_provider_type: Provider type - "Internal" (required)
+
+        :returns: returns newly created group on success, exception with HTTP error code on failure
+        """
+        data = '{"name": "' + group_name + '", "description": "' + \
+                                                        group_description + '", "security_provider_type": "INTERNAL"}'
+
+        return self._rbac_v1_create_request('/groups', data)
+
+    def update_group(self,
+                    group_id,
+                    group_name,
+                    group_description):
+        """
+        Updates a group
+
+        :param str group_id: Group's id (required)
+        :param str group_name: Group's name (required)
+        :param str group_description: Description of the group (not required)
+
+        :returns: returns newly created group on success, exception with HTTP error code on failure
+        """
+        data = '{"id": ' + str(group_id) + ', "name": "' + group_name + '", "description": "' + group_description\
+               + '", "security_provider_type": "INTERNAL"}'
+        r = self.get_group_by_name(group_name)
+        if isinstance(r, Group):
+            print("Duplicate Group name. Name should be unique!", file=sys.stderr)
+
+        return self._rbac_v1_create_request('/groups/%s' % group_id, data, 'PUT')
+
+    def delete_group(self, group_id):
+        """
+        deletes a single group.
+
+        :param group_id: ID of the group to delete.
+        """
+        return self._rbac_v1_create_request('/groups/%s' % group_id, method='DELETE', use_json=False)
 
     # rbac requests end
 

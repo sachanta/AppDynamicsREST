@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Sample script to create a user.
+Sample script to remove user from group.
 """
 
 from __future__ import print_function
@@ -12,9 +12,10 @@ from appd.request import AppDynamicsClient
 
 import random
 import string
+import requests
 
-__author__ = 'Kyle Furlong'
-__copyright__ = 'Copyright (c) 2013-2017 AppDynamics Inc.'
+__author__ = 'Srikar Achanta'
+__copyright__ = 'Copyright (c) 2013-2020 AppDynamics Inc.'
 
 args = parse_argv()
 c = AppDynamicsClient(args.url, args.username, args.password, args.account, args.verbose)
@@ -29,15 +30,20 @@ def get_random_string(length):
 
 
 if len(apps) > 0:
-
     first_name = get_random_string(5)
     second_name = get_random_string(5)
     email = first_name + '.' + second_name + '@email.com'
+    user = c.create_user_v1(first_name, first_name, email, 'password', 'INTERNAL')
+    group_name = get_random_string(5)
+    group = c.create_group(group_name, 'description to test group')
+    response = c.add_user_to_group(user['id'], group['id'])
+    print(user['id'], user['name'], group['id'], group['name'])
+    c.remove_user_from_group(user['id'], group['id'])
 
-    resp = c.create_user(first_name, second_name, email,
-                         user_password='johndoe', user_roles='Administrator,Universal Agent User')
-    print(resp)
+    # clean up
+    c.delete_role(user['id'])
+    c.delete_group(group['id'])
+    print(response)
+    print(response)
 else:
     print('Application, not found!')
-
-

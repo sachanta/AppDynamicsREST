@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Sample script to create a user.
+Sample script to update a user for the specified controller.
 """
 
 from __future__ import print_function
@@ -12,9 +12,10 @@ from appd.request import AppDynamicsClient
 
 import random
 import string
+import requests
 
-__author__ = 'Kyle Furlong'
-__copyright__ = 'Copyright (c) 2013-2017 AppDynamics Inc.'
+__author__ = 'Srikar Achanta'
+__copyright__ = 'Copyright (c) 2013-2020 AppDynamics Inc.'
 
 args = parse_argv()
 c = AppDynamicsClient(args.url, args.username, args.password, args.account, args.verbose)
@@ -29,15 +30,12 @@ def get_random_string(length):
 
 
 if len(apps) > 0:
-
-    first_name = get_random_string(5)
-    second_name = get_random_string(5)
-    email = first_name + '.' + second_name + '@email.com'
-
-    resp = c.create_user(first_name, second_name, email,
-                         user_password='johndoe', user_roles='Administrator,Universal Agent User')
+    user_name = get_random_string(5)
+    email = user_name + '@' + 'gmail.com'
+    response = c.create_user_v1(user_name, user_name, email, 'password', 'INTERNAL')
+    print(response)
+    resp = c.update_user(response['id'], get_random_string(5), "new-display-name")
     print(resp)
+    c.delete_user(response['id'])
 else:
     print('Application, not found!')
-
-
